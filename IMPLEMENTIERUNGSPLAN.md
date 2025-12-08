@@ -1,7 +1,7 @@
 # Mountrix - Detaillierter Implementierungsplan
 
 ## Projektziel
-Benutzerfreundliches GUI-Tool zum Einbinden von Netzlaufwerken (NFS, SMB/CIFS) und lokalen Laufwerken unter Linux mit Fokus auf Anfänger und Power-User.
+Benutzerfreundliches GUI-Tool zum Einbinden von Netzlaufwerken (NFS, SMB/CIFS) und lokalen Laufwerken (intern: SATA/NVMe, extern: USB/eSATA) unter Linux mit Fokus auf Anfänger und Power-User.
 
 ---
 

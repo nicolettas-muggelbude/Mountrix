@@ -17,7 +17,7 @@
 Mountrix ist ein modernes GUI-Tool für Linux, das das Einbinden (Mounten) von Netzlaufwerken und lokalen Laufwerken vereinfacht. Es richtet sich sowohl an unerfahrene Nutzer als auch an Power-User, die volle Kontrolle über ihre Mount-Konfigurationen benötigen.
 
 ### Problem
-Immer wieder treten in Linux-Foren Probleme beim Einbinden von NAS, FritzNAS oder externen Laufwerken auf. Die manuelle Bearbeitung der `/etc/fstab` ist fehleranfällig und für Einsteiger eine Hürde.
+Immer wieder treten in Linux-Foren Probleme beim Einbinden von NAS, FritzNAS oder internen/externen Laufwerken auf. Die manuelle Bearbeitung der `/etc/fstab` ist fehleranfällig und für Einsteiger eine Hürde.
 
 ### Lösung
 Mountrix bietet einen intuitiven Assistenten und automatische Konfiguration für gängige NAS-Systeme, ohne dass Nutzer die Kommandozeile bemühen müssen.
@@ -35,7 +35,8 @@ Mountrix bietet einen intuitiven Assistenten und automatische Konfiguration für
 - **🔌 Protokoll-Unterstützung**:
   - SMB/CIFS (Windows-Shares, NAS)
   - NFS (Unix/Linux-Shares)
-  - Lokale Laufwerke (ext4, NTFS, exFAT)
+  - Interne Laufwerke (SATA, NVMe: ext4, NTFS, exFAT)
+  - Externe Laufwerke (USB, eSATA: ext4, NTFS, exFAT)
 
 - **🏢 NAS-Templates**:
   - AVM FRITZ!NAS
@@ -66,9 +67,9 @@ Mountrix bietet einen intuitiven Assistenten und automatische Konfiguration für
 ## 🎯 Zielgruppen
 
 - **Linux-Einsteiger**: Einfaches Mounten ohne Terminal-Kenntnisse
-- **Home-User**: NAS und externe Festplatten unkompliziert einbinden
+- **Home-User**: NAS und interne/externe Festplatten unkompliziert einbinden
 - **Power-User**: Volle Kontrolle mit erweiterten Optionen
-- **Gamer & Content Creator**: Zusätzliche SSDs/HDDs einfach verfügbar machen
+- **Gamer & Content Creator**: Zusätzliche interne SSDs/NVMe oder externe HDDs einfach verfügbar machen
 
 ---
 

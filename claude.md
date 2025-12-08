@@ -29,7 +29,8 @@ Mountrix ist ein benutzerfreundliches GUI-Tool zum Einbinden von Netzlaufwerken 
 ### Protokolle (Priorität)
 1. **SMB/CIFS** (Windows-Shares, NAS)
 2. **NFS** (Unix/Linux-Shares)
-3. **Lokale Laufwerke** (ext4, NTFS, exFAT, SATA, NVMe)
+3. **Interne Laufwerke** (SATA, NVMe: ext4, NTFS, exFAT)
+4. **Externe Laufwerke** (USB, eSATA: ext4, NTFS, exFAT)
 
 ### NAS-Templates
 Vorkonfigurierte Templates für:
@@ -60,26 +61,28 @@ Vorkonfigurierte Templates für:
 
 ## Roadmap
 
-### v1.0 (Aktuell)
+### v1.0 (Q2 2025 - Aktuell in Entwicklung)
 - GUI mit PyQt6 und GTK4
-- NFS, SMB/CIFS, lokale Laufwerke
+- NFS, SMB/CIFS
+- Interne Laufwerke (SATA, NVMe)
+- Externe Laufwerke (USB, eSATA)
 - NAS-Templates
 - Assistent + Power-User-Modus
 - PolicyKit-Integration
 - Rollback-Funktion
 - Deutsch + Englisch
 
-### v1.1 (Zukunft)
+### v1.1 (Q4 2025)
 - CLI-Interface
 - Mount-Gruppen / Profile
 - Konfiguration Import/Export
 
-### v1.2
+### v1.2 (Q1 2026)
 - WebDAV
 - SSHFS
 - systemd automount Option
 
-### v2.0
+### v2.0 (Q3 2026)
 - rsync-Integration
 - Scheduled Mounts
 - Web-Interface für Remote-Management
