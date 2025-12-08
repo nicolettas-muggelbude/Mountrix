@@ -6,7 +6,7 @@ PyQt6-Qt6>=6.6.0
 PyQt6-sip>=13.6.0
 
 # GTK (optional, für GNOME/XFCE)
-PyGObject>=3.42.0
+# PyGObject>=3.42.0  # Temporär deaktiviert - benötigt System-Dependencies (cairo, pkg-config)
 
 # Netzwerk & SMB
 smbprotocol>=1.10.0
