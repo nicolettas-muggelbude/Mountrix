@@ -1,0 +1,91 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.whl
+.installed.cfg
+*.egg-info/
+.Python
+develop-eggs/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+*.mo
+*.pot
+
+# Virtual Environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build-Artefakte
+*.deb
+*.snap
+*.flatpak
+*.tar.gz
+*.zip
+debian/files
+debian/*.debhelper
+debian/*.log
+debian/*.substvars
+debian/mountrix/
+
+# Logs
+*.log
+/var/log/
+
+# Credentials (Sicherheit!)
+*.cred
+credentials/
+.env
+.env.local
+secrets/
+
+# Temporäre Dateien
+*.tmp
+*.bak
+*.backup
+/tmp/
+
+# Test-Daten
+test_mounts/
+test_fstab*
+
+# Generated Icons (falls lokal generiert)
+# data/icons/*.png
+# Kommentar entfernen, wenn nur SVG im Repo sein soll
+
+# Compiled Translations
+locale/*/LC_MESSAGES/*.mo
+
+# Qt Designer temporäre Dateien
+*.autosave
+
+# Dokumentation Build
+docs/_build/
+docs/.doctrees/

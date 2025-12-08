@@ -1,0 +1,131 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mountrix"
+version = "0.1.0"
+description = "Benutzerfreundliches Mounten von Netzlaufwerken und lokalen Laufwerken unter Linux"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+    {name = "Nicole", email = "your.email@example.com"}
+]
+maintainers = [
+    {name = "Nicole", email = "your.email@example.com"}
+]
+keywords = [
+    "linux",
+    "mount",
+    "nfs",
+    "smb",
+    "cifs",
+    "nas",
+    "network-drives",
+    "gui",
+    "fstab"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Filesystems",
+    "Topic :: System :: Systems Administration",
+    "Environment :: X11 Applications :: Qt",
+    "Environment :: X11 Applications :: GTK",
+]
+
+dependencies = [
+    "PyQt6>=6.6.0",
+    "PyGObject>=3.42.0",
+    "smbprotocol>=1.10.0",
+    "pysmb>=1.2.9",
+    "keyring>=23.0.0",
+    "secretstorage>=3.3.0",
+    "cryptography>=41.0.0",
+    "psutil>=5.9.0",
+    "netifaces>=0.11.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-qt>=4.2.0",
+    "pytest-mock>=3.12.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/nicole/mountrix"
+Documentation = "https://github.com/nicole/mountrix/wiki"
+Repository = "https://github.com/nicole/mountrix.git"
+Issues = "https://github.com/nicole/mountrix/issues"
+
+[project.scripts]
+mountrix = "mountrix.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["mountrix*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--cov=src/mountrix",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+exclude = [
+    "venv",
+    "build",
+    "dist",
+]
+
+[tool.flake8]
+max-line-length = 100
+exclude = [
+    ".git",
+    "__pycache__",
+    "venv",
+    "build",
+    "dist",
+]
+ignore = ["E203", "W503"]

@@ -1,0 +1,156 @@
+{
+  "fritznas": {
+    "name": "AVM FRITZ!NAS",
+    "protocol": "cifs",
+    "default_port": 445,
+    "default_share_path": "//fritz.box/FRITZ.NAS",
+    "default_options": [
+      "vers=3.0",
+      "nofail",
+      "x-systemd.automount",
+      "uid=1000",
+      "gid=1000",
+      "file_mode=0755",
+      "dir_mode=0755"
+    ],
+    "auth_method": "credentials",
+    "description": "AVM FRITZ!Box NAS-Funktion (USB-Speicher an FRITZ!Box)",
+    "help_url": "https://avm.de/service/fritzbox/fritzbox-7590/wissensdatenbank/publication/show/1473_USB-Speicher-an-der-FRITZ-Box-als-Netzlaufwerk-einbinden-Windows/",
+    "notes": "Standard-Hostname ist 'fritz.box'. Bei mehreren USB-Geräten: //fritz.box/[Gerätename]"
+  },
+
+  "synology": {
+    "name": "Synology DiskStation",
+    "protocol": "cifs",
+    "default_port": 445,
+    "default_share_path": "//synology-nas/[sharename]",
+    "default_options": [
+      "vers=3.0",
+      "nofail",
+      "uid=1000",
+      "gid=1000",
+      "file_mode=0755",
+      "dir_mode=0755",
+      "iocharset=utf8"
+    ],
+    "auth_method": "credentials",
+    "description": "Synology DiskStation NAS",
+    "help_url": "https://kb.synology.com/en-global/DSM/tutorial/How_to_access_files_on_Synology_NAS_within_the_local_network_NFS",
+    "notes": "Hostname ist meist 'synology-nas' oder DiskStation-<Seriennummer>. SMB/CIFS muss in DSM aktiviert sein.",
+    "nfs_support": true,
+    "nfs_options": [
+      "nfsvers=4",
+      "nofail",
+      "soft",
+      "timeo=30"
+    ]
+  },
+
+  "qnap": {
+    "name": "QNAP NAS",
+    "protocol": "cifs",
+    "default_port": 445,
+    "default_share_path": "//qnap-nas/[sharename]",
+    "default_options": [
+      "vers=3.0",
+      "nofail",
+      "uid=1000",
+      "gid=1000",
+      "file_mode=0755",
+      "dir_mode=0755"
+    ],
+    "auth_method": "credentials",
+    "description": "QNAP Turbo NAS",
+    "help_url": "https://www.qnap.com/en/how-to/faq/article/how-to-map-a-network-drive-on-a-linux-computer",
+    "notes": "Standard-Hostname ist meist der QNAP-Name oder IP. SMB muss aktiviert sein.",
+    "nfs_support": true,
+    "nfs_options": [
+      "nfsvers=3",
+      "nofail",
+      "soft"
+    ]
+  },
+
+  "wd_mycloud": {
+    "name": "Western Digital My Cloud",
+    "protocol": "cifs",
+    "default_port": 445,
+    "default_share_path": "//wdmycloud/[sharename]",
+    "default_options": [
+      "vers=2.1",
+      "nofail",
+      "uid=1000",
+      "gid=1000",
+      "file_mode=0777",
+      "dir_mode=0777",
+      "sec=ntlm"
+    ],
+    "auth_method": "credentials",
+    "description": "WD My Cloud / My Cloud Home",
+    "help_url": "https://support-en.wd.com/app/answers/detailweb/a_id/10664",
+    "notes": "WD My Cloud nutzt oft ältere SMB-Versionen (2.1). Standard-Hostname: 'wdmycloud'",
+    "legacy_smb": true
+  },
+
+  "ugreen": {
+    "name": "UGREEN NAS",
+    "protocol": "cifs",
+    "default_port": 445,
+    "default_share_path": "//ugreen-nas/[sharename]",
+    "default_options": [
+      "vers=3.0",
+      "nofail",
+      "uid=1000",
+      "gid=1000",
+      "file_mode=0755",
+      "dir_mode=0755"
+    ],
+    "auth_method": "credentials",
+    "description": "UGREEN NASync DXP Series",
+    "help_url": "https://www.ugreen.com/pages/ugreen-nas",
+    "notes": "Moderne UGREEN NAS-Systeme mit UGOS. SMB v3 wird unterstützt.",
+    "nfs_support": true,
+    "nfs_options": [
+      "nfsvers=4",
+      "nofail",
+      "soft"
+    ]
+  },
+
+  "generic_nfs": {
+    "name": "Generisches NFS-Share",
+    "protocol": "nfs",
+    "default_port": 2049,
+    "default_share_path": "server:/export/path",
+    "default_options": [
+      "nfsvers=4",
+      "nofail",
+      "soft",
+      "timeo=30",
+      "retrans=3"
+    ],
+    "auth_method": "none",
+    "description": "Standard NFS-Freigabe (Unix/Linux)",
+    "help_url": "https://wiki.archlinux.org/title/NFS",
+    "notes": "NFS benötigt meist keine Authentifizierung (IP-basierte Zugriffskontrolle auf Server-Seite)"
+  },
+
+  "generic_smb": {
+    "name": "Generisches SMB/CIFS-Share",
+    "protocol": "cifs",
+    "default_port": 445,
+    "default_share_path": "//server/share",
+    "default_options": [
+      "vers=3.0",
+      "nofail",
+      "uid=1000",
+      "gid=1000",
+      "file_mode=0755",
+      "dir_mode=0755"
+    ],
+    "auth_method": "credentials",
+    "description": "Standard Windows/Samba-Freigabe",
+    "help_url": "https://wiki.archlinux.org/title/Samba",
+    "notes": "Universelles Template für SMB-Shares (Windows, Samba, NAS)"
+  }
+}
