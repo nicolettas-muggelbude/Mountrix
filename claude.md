@@ -61,7 +61,7 @@ Vorkonfigurierte Templates für:
 
 ## Roadmap
 
-### v1.0 (Q2 2025 - Aktuell in Entwicklung)
+### v1.0 (Q1 2026 - Aktuell in Entwicklung)
 - GUI mit PyQt6 und GTK4
 - NFS, SMB/CIFS
 - Interne Laufwerke (SATA, NVMe)
@@ -72,17 +72,17 @@ Vorkonfigurierte Templates für:
 - Rollback-Funktion
 - Deutsch + Englisch
 
-### v1.1 (Q4 2025)
+### v1.1 (Q2 2026)
 - CLI-Interface
 - Mount-Gruppen / Profile
 - Konfiguration Import/Export
 
-### v1.2 (Q1 2026)
+### v1.2 (Q3 2026)
 - WebDAV
 - SSHFS
 - systemd automount Option
 
-### v2.0 (Q3 2026)
+### v2.0 (Q1 2027)
 - rsync-Integration
 - Scheduled Mounts
 - Web-Interface für Remote-Management

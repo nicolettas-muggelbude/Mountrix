@@ -160,7 +160,7 @@ pytest tests/ -v --cov=src/mountrix
 
 ## 🗺️ Roadmap
 
-### v1.0 (Q2 2025)
+### v1.0 (Q1 2026)
 - ✅ Projekt-Setup und Planung
 - 🔲 Core-Backend (Detector, Mounter, fstab)
 - 🔲 PyQt6 GUI mit Assistent
