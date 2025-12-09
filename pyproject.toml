@@ -44,7 +44,7 @@ classifiers = [
 
 dependencies = [
     "PyQt6>=6.6.0",
-    "PyGObject>=3.42.0",
+    # "PyGObject>=3.42.0",  # Temporarily disabled - needs system dependencies
     "smbprotocol>=1.10.0",
     "pysmb>=1.2.9",
     "keyring>=23.0.0",
