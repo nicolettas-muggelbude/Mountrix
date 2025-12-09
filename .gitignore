@@ -74,7 +74,8 @@ secrets/
 
 # Test-Daten
 test_mounts/
-test_fstab*
+test_fstab
+test_fstab.bak
 
 # Generated Icons (falls lokal generiert)
 # data/icons/*.png
