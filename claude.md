@@ -126,12 +126,31 @@ Vorkonfigurierte Templates für:
 ## Aktueller Status
 - ✅ Projekt-Konzept definiert
 - ✅ Implementierungsplan erstellt
-- 🔲 Repository erstellen
-- 🔲 Phase 1: Core-Backend entwickeln
+- ✅ Repository erstellt (GitHub)
+- 🔄 **Phase 1: Core-Backend entwickeln** (in Arbeit)
+  - ✅ detector.py - Desktop & Laufwerk-Erkennung (17 Tests, 84% Coverage)
+  - ✅ fstab.py - fstab-Management (23 Tests, 83% Coverage)
+  - ✅ templates.py - NAS-Template-Management (23 Tests, 77% Coverage)
+  - ✅ network.py - Netzwerk-Diagnostik (38 Tests, 90% Coverage)
+  - 🔲 mounter.py - Mount-Logik
+  - 🔲 credentials.py - Authentifizierung
 - 🔲 Phase 2: GUI entwickeln
 - 🔲 Phase 3: Features integrieren
 - 🔲 Phase 4: Testing
 - 🔲 Phase 5: Paketierung & Release
+
+### Letzte Änderungen (2025-12-14)
+- **network.py vollständig implementiert** mit folgenden Funktionen:
+  - `ping_host()` - ICMP-Ping zur Host-Erreichbarkeitsprüfung
+  - `check_port()` - TCP-Port-Verfügbarkeitsprüfung
+  - `resolve_hostname()` - DNS-Auflösung von Hostnamen zu IPs
+  - `verify_nfs_mount()` - Temporärer NFS-Mount-Test
+  - `verify_smb_mount()` - Temporärer SMB/CIFS-Mount-Test mit Authentifizierung
+  - `verify_mount_temporary()` - High-Level-Funktion für Mount-Tests
+  - `diagnose_connection()` - Umfassende Verbindungsdiagnose
+  - `get_common_nas_ports()` - Port-Mapping für NAS-Protokolle
+- **38 Unit-Tests** für network.py mit 90% Code-Coverage
+- Alle Tests bestehen ✅
 
 ## Hinweise für Claude
 - Alle Ausgaben im Terminal auf **Deutsch**
