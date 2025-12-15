@@ -8,6 +8,8 @@
   [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
   [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
   ![Status](https://img.shields.io/badge/status-in%20development-yellow)
+  ![Tests](https://img.shields.io/badge/tests-176%20passing-brightgreen)
+  ![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)
 </div>
 
 ---
@@ -144,8 +146,28 @@ sudo apt install inkscape
 ### Tests ausführen
 
 ```bash
-pytest tests/ -v --cov=src/mountrix
+# Alle Tests ausführen
+pytest tests/ -v
+
+# Mit Coverage-Report
+pytest tests/ -v --cov=src/mountrix --cov-report=term
+
+# Aktueller Status: 176 Tests, 85% Coverage ✅
 ```
+
+### Aktueller Entwicklungsstand
+
+**Phase 1 - Core-Backend: ✅ ABGESCHLOSSEN**
+
+| Modul | Funktionen | Tests | Coverage |
+|-------|-----------|-------|----------|
+| detector.py | Desktop & Laufwerk-Erkennung | 17 | 84% |
+| fstab.py | fstab-Management & Backup | 23 | 83% |
+| templates.py | NAS-Templates (FRITZ!NAS, QNAP, etc.) | 23 | 77% |
+| network.py | Netzwerk-Diagnostik & Mount-Tests | 38 | 90% |
+| mounter.py | Mount/Unmount-Operationen | 37 | 86% |
+| credentials.py | Keyring & Credential-Management | 38 | 86% |
+| **GESAMT** | **47 Funktionen** | **176** | **85%** |
 
 ---
 
@@ -162,10 +184,20 @@ pytest tests/ -v --cov=src/mountrix
 
 ### v1.0 (Q1 2026)
 - ✅ Projekt-Setup und Planung
-- 🔲 Core-Backend (Detector, Mounter, fstab)
-- 🔲 PyQt6 GUI mit Assistent
-- 🔲 NAS-Templates
-- 🔲 Paketierung (.deb, Snap)
+- ✅ **Phase 1: Core-Backend komplett** (176 Tests, 85% Coverage)
+  - ✅ Desktop & Laufwerk-Erkennung (detector.py)
+  - ✅ fstab-Management (fstab.py)
+  - ✅ NAS-Template-System (templates.py)
+  - ✅ Netzwerk-Diagnostik (network.py)
+  - ✅ Mount-Logik (mounter.py)
+  - ✅ Credentials-Management (credentials.py)
+- 🔄 **Phase 2: GUI-Entwicklung** (in Planung)
+  - 🔲 PyQt6 Hauptfenster
+  - 🔲 Assistent-Modus
+  - 🔲 Power-User-Modus
+- 🔲 Phase 3: Features & Integration
+- 🔲 Phase 4: Testing & QA
+- 🔲 Phase 5: Paketierung (.deb, Snap)
 
 ### v1.1
 - CLI-Interface
