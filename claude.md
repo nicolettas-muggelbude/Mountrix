@@ -127,30 +127,37 @@ Vorkonfigurierte Templates für:
 - ✅ Projekt-Konzept definiert
 - ✅ Implementierungsplan erstellt
 - ✅ Repository erstellt (GitHub)
-- 🔄 **Phase 1: Core-Backend entwickeln** (in Arbeit)
+- ✅ **Phase 1: Core-Backend entwickeln** (ABGESCHLOSSEN!)
   - ✅ detector.py - Desktop & Laufwerk-Erkennung (17 Tests, 84% Coverage)
   - ✅ fstab.py - fstab-Management (23 Tests, 83% Coverage)
   - ✅ templates.py - NAS-Template-Management (23 Tests, 77% Coverage)
   - ✅ network.py - Netzwerk-Diagnostik (38 Tests, 90% Coverage)
   - ✅ mounter.py - Mount-Logik (37 Tests, 86% Coverage)
-  - 🔲 credentials.py - Authentifizierung
+  - ✅ credentials.py - Authentifizierung (38 Tests, 86% Coverage)
 - 🔲 Phase 2: GUI entwickeln
 - 🔲 Phase 3: Features integrieren
 - 🔲 Phase 4: Testing
 - 🔲 Phase 5: Paketierung & Release
 
 ### Letzte Änderungen (2025-12-15)
-- **mounter.py vollständig implementiert** mit folgenden Funktionen:
-  - `create_mountpoint()` - Erstellt Mountpoints (/media/<user> oder /mnt)
-  - `mount_entry()` - Mountet fstab-Einträge
-  - `unmount_entry()` - Unmountet Dateisysteme (mit force-Option)
-  - `verify_mount()` - Prüft Mount-Status via /proc/mounts
-  - `get_mount_info()` - Liefert detaillierte Mount-Informationen
-  - `remount_entry()` - Unmount + Mount in einem Schritt
-  - `get_current_username()` - Ermittelt aktuellen Benutzer
-- **37 Unit-Tests** für mounter.py mit 86% Code-Coverage
-- **network.py vollständig implementiert** (38 Tests, 90% Coverage)
-- Alle Tests bestehen ✅
+- 🎉 **Phase 1 Core-Backend komplett abgeschlossen!**
+- **credentials.py vollständig implementiert** mit folgenden Funktionen:
+  - `save_credentials_keyring()` - Speichert Credentials in GNOME Keyring/KWallet
+  - `load_credentials_keyring()` - Lädt Credentials aus Keyring
+  - `delete_credentials_keyring()` - Löscht Credentials aus Keyring
+  - `generate_credentials_file()` - Erstellt CIFS-Credential-Dateien (chmod 600)
+  - `delete_credentials_file()` - Löscht Credential-Dateien (mit Security-Check)
+  - `validate_ssh_key()` - Validiert SSH-Keys (Permissions, Format)
+  - `get_credential_files()` - Listet alle Credential-Dateien
+  - `read_credentials_file()` - Liest und parsed Credential-Dateien
+  - `is_keyring_available()` - Prüft Keyring-Verfügbarkeit
+- **38 Unit-Tests** für credentials.py mit 86% Code-Coverage
+- Alle 176 Core-Backend-Tests bestehen ✅
+
+**Phase 1 Statistik:**
+- 6 Module vollständig implementiert
+- 176 Unit-Tests insgesamt
+- Durchschnittliche Coverage: 84%
 
 ## Hinweise für Claude
 - Alle Ausgaben im Terminal auf **Deutsch**
