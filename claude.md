@@ -132,24 +132,24 @@ Vorkonfigurierte Templates für:
   - ✅ fstab.py - fstab-Management (23 Tests, 83% Coverage)
   - ✅ templates.py - NAS-Template-Management (23 Tests, 77% Coverage)
   - ✅ network.py - Netzwerk-Diagnostik (38 Tests, 90% Coverage)
-  - 🔲 mounter.py - Mount-Logik
+  - ✅ mounter.py - Mount-Logik (37 Tests, 86% Coverage)
   - 🔲 credentials.py - Authentifizierung
 - 🔲 Phase 2: GUI entwickeln
 - 🔲 Phase 3: Features integrieren
 - 🔲 Phase 4: Testing
 - 🔲 Phase 5: Paketierung & Release
 
-### Letzte Änderungen (2025-12-14)
-- **network.py vollständig implementiert** mit folgenden Funktionen:
-  - `ping_host()` - ICMP-Ping zur Host-Erreichbarkeitsprüfung
-  - `check_port()` - TCP-Port-Verfügbarkeitsprüfung
-  - `resolve_hostname()` - DNS-Auflösung von Hostnamen zu IPs
-  - `verify_nfs_mount()` - Temporärer NFS-Mount-Test
-  - `verify_smb_mount()` - Temporärer SMB/CIFS-Mount-Test mit Authentifizierung
-  - `verify_mount_temporary()` - High-Level-Funktion für Mount-Tests
-  - `diagnose_connection()` - Umfassende Verbindungsdiagnose
-  - `get_common_nas_ports()` - Port-Mapping für NAS-Protokolle
-- **38 Unit-Tests** für network.py mit 90% Code-Coverage
+### Letzte Änderungen (2025-12-15)
+- **mounter.py vollständig implementiert** mit folgenden Funktionen:
+  - `create_mountpoint()` - Erstellt Mountpoints (/media/<user> oder /mnt)
+  - `mount_entry()` - Mountet fstab-Einträge
+  - `unmount_entry()` - Unmountet Dateisysteme (mit force-Option)
+  - `verify_mount()` - Prüft Mount-Status via /proc/mounts
+  - `get_mount_info()` - Liefert detaillierte Mount-Informationen
+  - `remount_entry()` - Unmount + Mount in einem Schritt
+  - `get_current_username()` - Ermittelt aktuellen Benutzer
+- **37 Unit-Tests** für mounter.py mit 86% Code-Coverage
+- **network.py vollständig implementiert** (38 Tests, 90% Coverage)
 - Alle Tests bestehen ✅
 
 ## Hinweise für Claude
