@@ -134,12 +134,17 @@ Vorkonfigurierte Templates für:
   - ✅ network.py - Netzwerk-Diagnostik (38 Tests, 90% Coverage)
   - ✅ mounter.py - Mount-Logik (37 Tests, 86% Coverage)
   - ✅ credentials.py - Authentifizierung (38 Tests, 86% Coverage)
-- 🔲 Phase 2: GUI entwickeln
+- 🔄 **Phase 2: GUI entwickeln** (in Arbeit)
+  - ✅ PyQt6 Hauptfenster (main_window.py)
+  - ✅ 9-Schritt-Assistent (wizard.py)
+  - ✅ Power-User-Modus (advanced.py)
+  - ✅ Dialogs (dialogs.py)
+  - 🔲 GTK4 GUI (optional)
 - 🔲 Phase 3: Features integrieren
 - 🔲 Phase 4: Testing
 - 🔲 Phase 5: Paketierung & Release
 
-### Letzte Änderungen (2025-12-15)
+### Letzte Änderungen (2025-12-16)
 - 🎉 **Phase 1 Core-Backend komplett abgeschlossen!**
 - **credentials.py vollständig implementiert** mit folgenden Funktionen:
   - `save_credentials_keyring()` - Speichert Credentials in GNOME Keyring/KWallet
@@ -157,7 +162,15 @@ Vorkonfigurierte Templates für:
 **Phase 1 Statistik:**
 - 6 Module vollständig implementiert
 - 176 Unit-Tests insgesamt
-- Durchschnittliche Coverage: 84%
+- Durchschnittliche Coverage: 85%
+
+**Phase 2.1 PyQt6 GUI - Fortschritt:**
+- ✅ main_window.py: Hauptfenster mit Menü, Toolbar, TreeView
+- ✅ wizard.py: 9-Schritt-Assistent für Anfänger
+- ✅ advanced.py: Power-User-Modus mit Syntax-Highlighting
+- ✅ dialogs.py: Bestätigung, Fehler, Progress, Rollback, Einstellungen
+- 🔲 Integration mit main.py (Desktop-Erkennung)
+- 🔲 GUI-Tests
 
 ## Hinweise für Claude
 - Alle Ausgaben im Terminal auf **Deutsch**
