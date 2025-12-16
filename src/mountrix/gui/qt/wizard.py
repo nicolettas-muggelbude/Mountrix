@@ -73,7 +73,7 @@ class ModePage(QWizardPage):
         super().__init__()
         self.setTitle("Mount-Typ wählen")
         self.setSubTitle(
-            "Wählen Sie, ob Sie ein Netzlaufwerk oder ein lokales Laufwerk mounten möchten."
+            "Wähle, ob du ein Netzlaufwerk oder ein lokales Laufwerk mounten möchtest."
         )
 
         layout = QVBoxLayout()
@@ -122,8 +122,8 @@ class TemplatePage(QWizardPage):
         super().__init__()
         self.setTitle("NAS-Template wählen")
         self.setSubTitle(
-            "Wählen Sie Ihr NAS-System für optimierte Einstellungen, "
-            "oder konfigurieren Sie manuell."
+            "Wähle dein NAS-System für optimierte Einstellungen, "
+            "oder konfiguriere manuell."
         )
 
         layout = QVBoxLayout()
@@ -172,7 +172,7 @@ class TemplatePage(QWizardPage):
         template_id = self.template_combo.currentData()
         if template_id == "manual":
             self.template_desc.setText(
-                "Sie können alle Parameter manuell eingeben."
+                "Du kannst alle Parameter manuell eingeben."
             )
         else:
             try:
@@ -199,7 +199,7 @@ class NetworkPage(QWizardPage):
         """Initialize the network configuration page."""
         super().__init__()
         self.setTitle("Netzwerk-Konfiguration")
-        self.setSubTitle("Geben Sie die Adresse und den Freigabepfad Ihres NAS ein.")
+        self.setSubTitle("Gib die Adresse und den Freigabepfad deines NAS ein.")
 
         layout = QVBoxLayout()
 
@@ -258,7 +258,7 @@ class LocalDrivePage(QWizardPage):
         """Initialize the local drive page."""
         super().__init__()
         self.setTitle("Laufwerk wählen")
-        self.setSubTitle("Wählen Sie das Laufwerk, das Sie mounten möchten.")
+        self.setSubTitle("Wähle das Laufwerk, das du mounten möchtest.")
 
         layout = QVBoxLayout()
 
@@ -302,7 +302,7 @@ class AuthenticationPage(QWizardPage):
         """Initialize the authentication page."""
         super().__init__()
         self.setTitle("Authentifizierung")
-        self.setSubTitle("Geben Sie die Anmeldedaten für den Zugriff ein (falls erforderlich).")
+        self.setSubTitle("Gib die Anmeldedaten für den Zugriff ein (falls erforderlich).")
 
         layout = QVBoxLayout()
 
@@ -378,7 +378,7 @@ class MountOptionsPage(QWizardPage):
         """Initialize the mount options page."""
         super().__init__()
         self.setTitle("Mount-Optionen")
-        self.setSubTitle("Konfigurieren Sie, wie und wo das Laufwerk gemountet werden soll.")
+        self.setSubTitle("Konfiguriere, wie und wo das Laufwerk gemountet werden soll.")
 
         layout = QVBoxLayout()
 
@@ -439,7 +439,7 @@ class ConnectionTestPage(QWizardPage):
         """Initialize the connection test page."""
         super().__init__()
         self.setTitle("Verbindungstest")
-        self.setSubTitle("Testen Sie die Verbindung vor dem Erstellen des Mounts.")
+        self.setSubTitle("Teste die Verbindung vor dem Erstellen des Mounts.")
 
         layout = QVBoxLayout()
 
@@ -504,7 +504,7 @@ class PreviewPage(QWizardPage):
         """Initialize the preview page."""
         super().__init__()
         self.setTitle("Vorschau")
-        self.setSubTitle("Überprüfen Sie die fstab-Konfiguration vor dem Erstellen.")
+        self.setSubTitle("Überprüfe die fstab-Konfiguration vor dem Erstellen.")
 
         layout = QVBoxLayout()
 
@@ -573,7 +573,7 @@ class ConfirmPage(QWizardPage):
         """Initialize the confirmation page."""
         super().__init__()
         self.setTitle("Bestätigung")
-        self.setSubTitle("Klicken Sie auf 'Fertig', um den Mount zu erstellen.")
+        self.setSubTitle("Klicke auf 'Fertig', um den Mount zu erstellen.")
 
         layout = QVBoxLayout()
 
@@ -584,7 +584,7 @@ class ConfirmPage(QWizardPage):
             "2. Mountpoint erstellen<br>"
             "3. fstab-Eintrag hinzufügen<br>"
             "4. Mount testen<br><br>"
-            "Möchten Sie fortfahren?"
+            "Möchtest du fortfahren?"
         )
         info.setWordWrap(True)
         layout.addWidget(info)

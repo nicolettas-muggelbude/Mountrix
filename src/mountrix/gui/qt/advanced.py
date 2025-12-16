@@ -110,7 +110,7 @@ class AdvancedMountDialog(QDialog):
         # Info label
         info = QLabel(
             "<b>Power-User-Modus</b><br>"
-            "Konfigurieren Sie alle fstab-Parameter direkt. "
+            "Konfiguriere alle fstab-Parameter direkt. "
             "Änderungen werden in Echtzeit validiert."
         )
         info.setWordWrap(True)

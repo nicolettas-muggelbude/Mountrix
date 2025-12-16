@@ -292,7 +292,7 @@ class MountrixMainWindow(QMainWindow):
         selected_items = self.mount_tree.selectedItems()
         if not selected_items:
             QMessageBox.warning(
-                self, "Keine Auswahl", "Bitte wählen Sie einen Mount zum Bearbeiten aus."
+                self, "Keine Auswahl", "Bitte wähle einen Mount zum Bearbeiten aus."
             )
             return
 
@@ -309,7 +309,7 @@ class MountrixMainWindow(QMainWindow):
         selected_items = self.mount_tree.selectedItems()
         if not selected_items:
             QMessageBox.warning(
-                self, "Keine Auswahl", "Bitte wählen Sie einen Mount zum Löschen aus."
+                self, "Keine Auswahl", "Bitte wähle einen Mount zum Löschen aus."
             )
             return
 
@@ -320,7 +320,7 @@ class MountrixMainWindow(QMainWindow):
         reply = QMessageBox.question(
             self,
             "Mount löschen",
-            f"Möchten Sie den Mount wirklich löschen?\n\nMountpoint: {mountpoint}",
+            f"Möchtest du den Mount wirklich löschen?\n\nMountpoint: {mountpoint}",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
@@ -337,8 +337,8 @@ class MountrixMainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "Assistent-Modus",
-            "Der Assistent-Modus wird Sie Schritt für Schritt durch "
-            "die Erstellung eines neuen Mounts führen.\n\n"
+            "Der Assistent-Modus führt dich Schritt für Schritt durch "
+            "die Erstellung eines neuen Mounts.\n\n"
             "(Noch nicht implementiert)",
         )
 
@@ -348,7 +348,7 @@ class MountrixMainWindow(QMainWindow):
         QMessageBox.information(
             self,
             "Power-User-Modus",
-            "Im Power-User-Modus können Sie alle fstab-Parameter "
+            "Im Power-User-Modus kannst du alle fstab-Parameter "
             "direkt konfigurieren.\n\n"
             "(Noch nicht implementiert)",
         )

@@ -45,7 +45,7 @@ class ConfirmationDialog(QDialog):
         warning_layout = QHBoxLayout()
         warning_label = QLabel(
             "<h3>⚠ Bestätigung erforderlich</h3>"
-            "<p>Die fstab-Datei wird geändert. Bitte überprüfen Sie die Änderungen.</p>"
+            "<p>Die fstab-Datei wird geändert. Bitte überprüfe die Änderungen.</p>"
         )
         warning_label.setWordWrap(True)
         warning_layout.addWidget(warning_label)
@@ -249,7 +249,7 @@ class RollbackDialog(QDialog):
         options_layout = QVBoxLayout()
 
         rollback_label = QLabel(
-            "Möchten Sie die Änderungen rückgängig machen und "
+            "Möchtest du die Änderungen rückgängig machen und "
             "das Backup wiederherstellen?"
         )
         rollback_label.setWordWrap(True)

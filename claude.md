@@ -178,3 +178,4 @@ Vorkonfigurierte Templates für:
 - Diese claude.md automatisch fortführen bei Projekt-Fortschritt
 - Code-Style: PEP 8, Type Hints verwenden
 - Kommentare auf Englisch im Code, Dokumentation auf Deutsch
+- **GUI-Dialoge und Benutzeransprache: "Du" statt "Sie"**
