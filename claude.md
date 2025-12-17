@@ -144,7 +144,19 @@ Vorkonfigurierte Templates für:
 - 🔲 Phase 4: Testing
 - 🔲 Phase 5: Paketierung & Release
 
-### Letzte Änderungen (2025-12-16)
+### Letzte Änderungen (2025-12-17)
+- ✅ **main.py implementiert** - Desktop-Erkennung und GUI-Framework-Loading
+  - Automatische Erkennung von Qt-basierten (KDE, LXQt) und GTK-basierten Desktops (GNOME, XFCE, Cinnamon)
+  - Intelligente Framework-Auswahl: Nativer Stack wird bevorzugt, Fallback auf alternative GUI
+  - Dependency-Checks für PyQt6 und GTK4
+  - Fehlerbehandlung bei fehlenden Abhängigkeiten
+- ✅ **bin/mountrix Einstiegspunkt** - Kommandozeilen-Script zum direkten Starten
+- ✅ **GUI auf "Du"-Form umgestellt** - Alle Dialoge nutzen informelle Ansprache
+- 🎉 **Phase 2.1 PyQt6 GUI komplett abgeschlossen!**
+  - main_window.py (400 Zeilen)
+  - wizard.py (600 Zeilen, 9-Schritt-Assistent)
+  - advanced.py (400 Zeilen, Power-User-Modus)
+  - dialogs.py (400 Zeilen, 5 Dialog-Typen)
 - 🎉 **Phase 1 Core-Backend komplett abgeschlossen!**
 - **credentials.py vollständig implementiert** mit folgenden Funktionen:
   - `save_credentials_keyring()` - Speichert Credentials in GNOME Keyring/KWallet
@@ -169,7 +181,8 @@ Vorkonfigurierte Templates für:
 - ✅ wizard.py: 9-Schritt-Assistent für Anfänger
 - ✅ advanced.py: Power-User-Modus mit Syntax-Highlighting
 - ✅ dialogs.py: Bestätigung, Fehler, Progress, Rollback, Einstellungen
-- 🔲 Integration mit main.py (Desktop-Erkennung)
+- ✅ Integration mit main.py (Desktop-Erkennung)
+- ✅ Einstiegspunkt bin/mountrix erstellt
 - 🔲 GUI-Tests
 
 ## Hinweise für Claude
