@@ -5,7 +5,7 @@ Common dialogs for Mountrix PyQt6 GUI.
 Provides confirmation, error, progress, and settings dialogs.
 """
 
-from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtCore import Qt, QTimer, QEvent
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -316,6 +316,31 @@ class SettingsDialog(QDialog):
         self.setWindowTitle("Einstellungen")
         self.setMinimumSize(500, 400)
 
+        # Modal behavior - Dialog muss geschlossen werden
+        self.setModal(True)
+        self.setWindowModality(Qt.WindowModality.ApplicationModal)
+
+        # Window Flags: Dialog bleibt im Vordergrund
+        self.setWindowFlags(
+            Qt.WindowType.Dialog |
+            Qt.WindowType.WindowStaysOnTopHint |
+            Qt.WindowType.WindowCloseButtonHint
+        )
+
+        # Rahmen für visuelle Abgrenzung
+        self.setStyleSheet("""
+            QDialog {
+                border: 2px solid #3498db;
+                border-radius: 8px;
+                background-color: palette(window);
+            }
+        """)
+
+        # Timer für periodisches Focus-Check (KDE Plasma/Wayland Workaround)
+        self.focus_timer = QTimer(self)
+        self.focus_timer.timeout.connect(self._check_focus)
+        self.focus_timer.start(100)  # Alle 100ms checken
+
         layout = QVBoxLayout()
 
         # General settings
@@ -407,6 +432,25 @@ class SettingsDialog(QDialog):
             "log_level": self.log_level_combo.currentText(),
             "backup_count": int(self.backup_count_combo.currentText()),
         }
+
+    def changeEvent(self, event):
+        """Handle window state changes - keep dialog in foreground."""
+        if event.type() == QEvent.Type.WindowDeactivate:
+            # Dialog verliert Fokus - bringe ihn zurück in den Vordergrund
+            QTimer.singleShot(10, self._bring_to_front)
+        super().changeEvent(event)
+
+    def _bring_to_front(self):
+        """Bring dialog to front if still visible."""
+        if self.isVisible():
+            self.raise_()
+            self.activateWindow()
+
+    def _check_focus(self):
+        """Periodisch prüfen, ob Dialog Fokus hat (Wayland Workaround)."""
+        if self.isVisible() and not self.isActiveWindow():
+            self.raise_()
+            self.activateWindow()
 
 
 if __name__ == "__main__":
