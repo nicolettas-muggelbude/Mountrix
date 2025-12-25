@@ -24,6 +24,7 @@ from PyQt6.QtWidgets import (
 )
 
 from ...core.fstab import FstabEntry
+from .dialogs import setup_combobox_auto_close
 
 
 class FstabSyntaxHighlighter(QSyntaxHighlighter):
@@ -166,7 +167,9 @@ class AdvancedMountDialog(QDialog):
             "cifs", "smb", "nfs", "nfs4",
             "ext4", "ext3", "ntfs", "exfat", "vfat"
         ])
-        self.fstype_combo.setEditable(True)
+        # Set to False for better UX (can be True if custom fs types needed)
+        self.fstype_combo.setEditable(False)
+        setup_combobox_auto_close(self.fstype_combo)
         self.fstype_combo.currentTextChanged.connect(self._on_fstype_changed)
         self.fstype_combo.currentTextChanged.connect(self._validate_and_update_preview)
 

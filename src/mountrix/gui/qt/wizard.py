@@ -27,6 +27,7 @@ from PyQt6.QtWidgets import (
 from ...core.templates import load_templates
 from ...core.network import ping_host, check_port, diagnose_connection
 from ...core.detector import detect_local_drives
+from .dialogs import setup_combobox_auto_close
 
 
 class MountWizard(QWizard):
@@ -133,6 +134,8 @@ class TemplatePage(QWizardPage):
         template_layout = QVBoxLayout()
 
         self.template_combo = QComboBox()
+        self.template_combo.setEditable(False)
+        setup_combobox_auto_close(self.template_combo)
         self.template_combo.addItem("Manuell konfigurieren", "manual")
 
         # Load templates
@@ -232,6 +235,8 @@ class NetworkPage(QWizardPage):
         protocol_layout = QHBoxLayout()
 
         self.protocol_combo = QComboBox()
+        self.protocol_combo.setEditable(False)
+        setup_combobox_auto_close(self.protocol_combo)
         self.protocol_combo.addItems(["SMB/CIFS (Windows, NAS)", "NFS (Linux, Unix)"])
         protocol_layout.addWidget(self.protocol_combo)
 

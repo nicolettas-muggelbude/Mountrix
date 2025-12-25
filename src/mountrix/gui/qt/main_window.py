@@ -10,7 +10,7 @@ Provides the main user interface with:
 """
 
 from PyQt6.QtCore import Qt, QSize
-from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtGui import QAction, QIcon, QPalette, QColor
 from PyQt6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -26,9 +26,96 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from ...core.detector import detect_desktop_environment
+from ...core.detector import detect_desktop_environment, detect_system_theme
 from ...core.fstab import parse_fstab
 from ...core.mounter import verify_mount
+
+
+def create_dark_palette() -> QPalette:
+    """
+    Create a dark color palette for the application.
+
+    Returns:
+        QPalette: Dark color scheme palette
+    """
+    dark_palette = QPalette()
+
+    # Window colors
+    dark_palette.setColor(QPalette.ColorRole.Window, QColor(53, 53, 53))
+    dark_palette.setColor(QPalette.ColorRole.WindowText, QColor(255, 255, 255))
+
+    # Base colors (for input fields, lists, etc.)
+    dark_palette.setColor(QPalette.ColorRole.Base, QColor(35, 35, 35))
+    dark_palette.setColor(QPalette.ColorRole.AlternateBase, QColor(53, 53, 53))
+
+    # Text colors
+    dark_palette.setColor(QPalette.ColorRole.Text, QColor(255, 255, 255))
+    dark_palette.setColor(QPalette.ColorRole.PlaceholderText, QColor(128, 128, 128))
+
+    # Button colors
+    dark_palette.setColor(QPalette.ColorRole.Button, QColor(53, 53, 53))
+    dark_palette.setColor(QPalette.ColorRole.ButtonText, QColor(255, 255, 255))
+
+    # Highlight colors
+    dark_palette.setColor(QPalette.ColorRole.Highlight, QColor(42, 130, 218))
+    dark_palette.setColor(QPalette.ColorRole.HighlightedText, QColor(255, 255, 255))
+
+    # Link colors
+    dark_palette.setColor(QPalette.ColorRole.Link, QColor(42, 130, 218))
+    dark_palette.setColor(QPalette.ColorRole.LinkVisited, QColor(147, 112, 219))
+
+    # Disabled colors
+    dark_palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.WindowText,
+                          QColor(128, 128, 128))
+    dark_palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.Text,
+                          QColor(128, 128, 128))
+    dark_palette.setColor(QPalette.ColorGroup.Disabled, QPalette.ColorRole.ButtonText,
+                          QColor(128, 128, 128))
+
+    return dark_palette
+
+
+def create_light_palette() -> QPalette:
+    """
+    Create a light color palette for the application.
+
+    Returns:
+        QPalette: Light color scheme palette (system default)
+    """
+    # Return the default system palette
+    app = QApplication.instance()
+    if app and app.style():
+        return app.style().standardPalette()
+
+    # Fallback: create a default light palette
+    return QPalette()
+
+
+def apply_theme(theme: str) -> None:
+    """
+    Apply a theme to the application.
+
+    Args:
+        theme: Theme name ("dark", "light", or "system")
+    """
+    app = QApplication.instance()
+    if not app:
+        return
+
+    if theme == "dark":
+        app.setPalette(create_dark_palette())
+    elif theme == "light":
+        app.setPalette(create_light_palette())
+    elif theme == "system":
+        # Detect system theme and apply
+        system_theme = detect_system_theme()
+        if system_theme == "dark":
+            app.setPalette(create_dark_palette())
+        else:
+            app.setPalette(create_light_palette())
+    else:
+        # Default to light
+        app.setPalette(create_light_palette())
 
 
 class MountrixMainWindow(QMainWindow):
@@ -39,6 +126,10 @@ class MountrixMainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Mountrix - Mount Manager")
         self.setMinimumSize(900, 600)
+
+        # Apply system theme automatically on startup
+        apply_theme("system")
+        self.current_theme = "system"
 
         # Initialize UI components
         self._create_menu_bar()
@@ -355,18 +446,42 @@ class MountrixMainWindow(QMainWindow):
 
     def on_settings(self):
         """Open settings dialog."""
-        # TODO: Open settings dialog
-        QMessageBox.information(
-            self, "Einstellungen", "Einstellungen-Dialog noch nicht implementiert."
-        )
+        from .dialogs import SettingsDialog
+
+        dialog = SettingsDialog(self)
+
+        # Pre-select current theme
+        theme_map = {"system": "System", "dark": "Dunkel", "light": "Hell"}
+        current_theme_text = theme_map.get(self.current_theme, "System")
+        dialog.theme_combo.setCurrentText(current_theme_text)
+
+        if dialog.exec():
+            settings = dialog.get_settings()
+
+            # Apply theme based on settings
+            theme_text = settings["theme"]
+            if theme_text == "System":
+                apply_theme("system")
+                self.current_theme = "system"
+            elif theme_text == "Dunkel":
+                apply_theme("dark")
+                self.current_theme = "dark"
+            elif theme_text == "Hell":
+                apply_theme("light")
+                self.current_theme = "light"
+
+            self.status_bar.showMessage(f"Einstellungen gespeichert: Theme '{theme_text}'")
 
     def on_toggle_dark_mode(self, checked):
         """Toggle dark mode."""
-        # TODO: Implement dark mode toggle
         if checked:
+            apply_theme("dark")
+            self.current_theme = "dark"
             self.status_bar.showMessage("Dark Mode aktiviert")
         else:
-            self.status_bar.showMessage("Dark Mode deaktiviert")
+            apply_theme("light")
+            self.current_theme = "light"
+            self.status_bar.showMessage("Light Mode aktiviert")
 
     def on_about(self):
         """Show about dialog."""

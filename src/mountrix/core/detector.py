@@ -335,6 +335,115 @@ def scan_network_shares() -> List[NetworkShare]:
     return shares
 
 
+def detect_system_theme() -> str:
+    """
+    Detect system theme preference (dark or light).
+
+    Returns:
+        str: "dark", "light", or "unknown"
+
+    Note:
+        Checks various desktop environment settings to determine theme.
+    """
+    desktop = detect_desktop_environment()
+
+    # Try different methods based on desktop environment
+    try:
+        # KDE Plasma
+        if desktop == DesktopEnvironment.KDE:
+            try:
+                result = subprocess.run(
+                    ["kreadconfig5", "--group", "General", "--key", "ColorScheme"],
+                    capture_output=True,
+                    text=True,
+                    timeout=2,
+                )
+                if result.returncode == 0:
+                    scheme = result.stdout.strip().lower()
+                    if "dark" in scheme or "breeze dark" in scheme:
+                        return "dark"
+                    return "light"
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+        # GNOME
+        if desktop == DesktopEnvironment.GNOME:
+            try:
+                result = subprocess.run(
+                    ["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"],
+                    capture_output=True,
+                    text=True,
+                    timeout=2,
+                )
+                if result.returncode == 0:
+                    theme = result.stdout.strip().lower()
+                    if "dark" in theme:
+                        return "dark"
+                    return "light"
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+            # Alternative: Check color-scheme setting (GNOME 42+)
+            try:
+                result = subprocess.run(
+                    ["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"],
+                    capture_output=True,
+                    text=True,
+                    timeout=2,
+                )
+                if result.returncode == 0:
+                    scheme = result.stdout.strip().lower()
+                    if "dark" in scheme:
+                        return "dark"
+                    if "light" in scheme:
+                        return "light"
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+        # XFCE
+        if desktop == DesktopEnvironment.XFCE:
+            try:
+                result = subprocess.run(
+                    ["xfconf-query", "-c", "xsettings", "-p", "/Net/ThemeName"],
+                    capture_output=True,
+                    text=True,
+                    timeout=2,
+                )
+                if result.returncode == 0:
+                    theme = result.stdout.strip().lower()
+                    if "dark" in theme:
+                        return "dark"
+                    return "light"
+            except (subprocess.TimeoutExpired, FileNotFoundError):
+                pass
+
+        # Generic: Check GTK theme from environment or config
+        gtk_theme = os.environ.get("GTK_THEME", "").lower()
+        if "dark" in gtk_theme:
+            return "dark"
+        if "light" in gtk_theme:
+            return "light"
+
+        # Check GTK3 settings file
+        gtk3_settings = Path.home() / ".config" / "gtk-3.0" / "settings.ini"
+        if gtk3_settings.exists():
+            try:
+                content = gtk3_settings.read_text()
+                for line in content.splitlines():
+                    if "gtk-theme-name" in line.lower():
+                        if "dark" in line.lower():
+                            return "dark"
+                        return "light"
+            except Exception:
+                pass
+
+    except Exception:
+        pass
+
+    # Default to light if cannot detect
+    return "unknown"
+
+
 if __name__ == "__main__":
     # Test code
     print("=== Mountrix Detector ===\n")

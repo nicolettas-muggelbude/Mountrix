@@ -23,6 +23,36 @@ from PyQt6.QtWidgets import (
 )
 
 
+def setup_combobox_auto_close(combobox: QComboBox) -> None:
+    """
+    Configure a ComboBox to automatically close its popup after selection.
+
+    Workaround for WSL2/Wayland where popups don't close automatically.
+    Uses 'pressed' signal instead of 'clicked' as it's the only one that fires on Wayland.
+    Closes the popup window directly as hidePopup() alone doesn't work on Wayland.
+
+    Args:
+        combobox: The QComboBox to configure
+    """
+    def on_item_pressed(index):
+        # Use QTimer to ensure the selection is processed in the next event loop
+        QTimer.singleShot(0, lambda: finalize_selection(index.row()))
+
+    def finalize_selection(row):
+        # Close the popup using multiple methods for Wayland compatibility
+        combobox.hidePopup()
+        combobox.view().hide()
+        # Critical for Wayland: close the popup window directly
+        popup_window = combobox.view().window()
+        if popup_window:
+            popup_window.hide()
+            popup_window.close()
+        # Set the selected index after popup is closed
+        QTimer.singleShot(10, lambda: combobox.setCurrentIndex(row))
+
+    combobox.view().pressed.connect(on_item_pressed)
+
+
 class ConfirmationDialog(QDialog):
     """Dialog to confirm fstab changes."""
 
@@ -293,11 +323,15 @@ class SettingsDialog(QDialog):
         general_layout = QFormLayout()
 
         self.language_combo = QComboBox()
+        self.language_combo.setEditable(False)
         self.language_combo.addItems(["Deutsch", "English"])
+        setup_combobox_auto_close(self.language_combo)
         general_layout.addRow("Sprache:", self.language_combo)
 
         self.theme_combo = QComboBox()
+        self.theme_combo.setEditable(False)
         self.theme_combo.addItems(["System", "Hell", "Dunkel"])
+        setup_combobox_auto_close(self.theme_combo)
         general_layout.addRow("Theme:", self.theme_combo)
 
         general_group.setLayout(general_layout)
@@ -334,13 +368,17 @@ class SettingsDialog(QDialog):
         advanced_layout = QFormLayout()
 
         self.log_level_combo = QComboBox()
+        self.log_level_combo.setEditable(False)
         self.log_level_combo.addItems(["DEBUG", "INFO", "WARNING", "ERROR"])
         self.log_level_combo.setCurrentText("INFO")
+        setup_combobox_auto_close(self.log_level_combo)
         advanced_layout.addRow("Log-Level:", self.log_level_combo)
 
         self.backup_count_combo = QComboBox()
+        self.backup_count_combo.setEditable(False)
         self.backup_count_combo.addItems(["3", "5", "10", "20"])
         self.backup_count_combo.setCurrentText("5")
+        setup_combobox_auto_close(self.backup_count_combo)
         advanced_layout.addRow("Max. Backup-Anzahl:", self.backup_count_combo)
 
         advanced_group.setLayout(advanced_layout)
