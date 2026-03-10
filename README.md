@@ -169,6 +169,25 @@ pytest tests/ -v --cov=src/mountrix --cov-report=term
 | credentials.py | Keyring & Credential-Management | 38 | 86% |
 | **GESAMT** | **47 Funktionen** | **176** | **85%** |
 
+**Phase 2 - GUI-Design: ✅ ABGESCHLOSSEN**
+
+| Komponente | Beschreibung |
+|-----------|-------------|
+| main_window.py | Hauptfenster mit Hamburger-Menü, Dark Mode, TreeWidget |
+| wizard.py | 9-seitiger Assistent (Typ, Template, Netzwerk, Auth, Optionen, Test, Preview) |
+| advanced.py | Power-User-Modus mit fstab-Syntax-Highlighting |
+| dialogs.py | Einstellungen, Fehler, Bestätigung, Progress |
+
+**Phase 3 - GUI-Backend-Anbindung: ✅ ABGESCHLOSSEN**
+
+| Feature | Beschreibung |
+|--------|-------------|
+| Wizard → fstab | Assistent schreibt fstab-Eintrag und mountet sofort |
+| Advanced → fstab | Power-User-Dialog schreibt und mountet |
+| Bearbeiten | AdvancedDialog im Edit-Modus, tauscht fstab-Eintrag aus |
+| Löschen | Unmountet + entfernt aus fstab |
+| Kontextmenü | Rechtsklick: Mount / Unmount / Bearbeiten / Löschen |
+
 ---
 
 ## 📚 Dokumentation
@@ -191,12 +210,14 @@ pytest tests/ -v --cov=src/mountrix --cov-report=term
   - ✅ Netzwerk-Diagnostik (network.py)
   - ✅ Mount-Logik (mounter.py)
   - ✅ Credentials-Management (credentials.py)
-- 🔄 **Phase 2: GUI-Entwicklung** (in Planung)
-  - 🔲 PyQt6 Hauptfenster
-  - 🔲 Assistent-Modus
-  - 🔲 Power-User-Modus
-- 🔲 Phase 3: Features & Integration
-- 🔲 Phase 4: Testing & QA
+- ✅ **Phase 2: GUI-Design komplett**
+  - ✅ PyQt6 Hauptfenster mit Dark Mode & Hamburger-Menü
+  - ✅ Assistent-Modus (9 Seiten)
+  - ✅ Power-User-Modus mit Syntax-Highlighting
+- ✅ **Phase 3: GUI-Backend-Anbindung komplett**
+  - ✅ Wizard/Advanced → fstab schreiben + mounten
+  - ✅ Bearbeiten, Löschen, Kontextmenü
+- 🔲 Phase 4: sudo/pkexec-Integration, Credentials-Keyring, Tests
 - 🔲 Phase 5: Paketierung (.deb, Snap)
 
 ### v1.1

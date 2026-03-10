@@ -142,15 +142,23 @@ Implementierte Features:
 - Hamburger-Menü Navigation
 ```
 
-## Nächste Schritte (Phase 3+)
+## Phase 3: GUI-Backend-Anbindung ✅ (Abgeschlossen)
+
+### Implementiert
+- ✅ Wizard → `get_result_entry()` → `FstabEntry` → `add_entry()` → `mount_entry()`
+- ✅ Advanced Dialog → `get_entry()` → `add_entry()` → `mount_entry()`
+- ✅ Bearbeiten: `remove_entry()` + `add_entry()` (via AdvancedMountDialog im Edit-Modus)
+- ✅ Löschen: `unmount_entry()` + `remove_entry()`
+- ✅ Kontextmenü (Rechtsklick): Mount / Unmount / Bearbeiten / Löschen
+- ✅ FstabEntry als `UserRole` in TreeWidgetItem gespeichert
+- ✅ LocalDrivePage speichert `_drives` Liste + `get_selected_drive()`
+
+### Nächste Schritte (Phase 4+)
 
 ### TODO: Funktionalität
-- [ ] Wizard-Dialog implementieren (Step-by-Step Mount-Erstellung)
-- [ ] Advanced-Dialog implementieren (direkte fstab-Konfiguration)
-- [ ] Mount/Unmount-Funktionalität (sudo-Handling)
-- [ ] Tatsächliches Löschen/Bearbeiten von Mounts
-- [ ] Backup/Rollback für fstab-Änderungen
-- [ ] Validierung von Mount-Parametern
+- [ ] sudo/pkexec-Integration für Root-Operationen (mount, fstab-Schreiben)
+- [ ] Backup/Rollback für fstab-Änderungen (UI-seitig)
+- [ ] Credentials im Keyring speichern (Wizard AuthPage)
 
 ### TODO: Weitere GUI-Verbesserungen
 - [ ] Icons für Buttons (statt nur Text)
@@ -206,5 +214,5 @@ python3 test_modern_design.py
 - CLAUDE.md für Projekt-Kontinuität
 
 ---
-*Zuletzt aktualisiert: 2025-12-25*
-*Status: Phase 2 (Modern Design) abgeschlossen ✅*
+*Zuletzt aktualisiert: 2026-03-11*
+*Status: Phase 3 (GUI-Backend-Anbindung) abgeschlossen ✅*

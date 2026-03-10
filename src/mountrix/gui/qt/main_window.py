@@ -27,8 +27,8 @@ from PyQt6.QtWidgets import (
 )
 
 from ...core.detector import detect_desktop_environment, detect_system_theme
-from ...core.fstab import parse_fstab
-from ...core.mounter import verify_mount
+from ...core.fstab import parse_fstab, add_entry, remove_entry
+from ...core.mounter import verify_mount, mount_entry, unmount_entry, create_mountpoint
 
 
 def get_modern_stylesheet(theme: str = "light") -> str:
@@ -779,6 +779,10 @@ class MountrixMainWindow(QMainWindow):
         # Connect double-click to edit
         self.mount_tree.itemDoubleClicked.connect(self.on_edit_mount)
 
+        # Kontextmenü
+        self.mount_tree.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.mount_tree.customContextMenuRequested.connect(self._show_context_menu)
+
         main_layout.addWidget(self.mount_tree)
 
         # Bottom button row
@@ -803,6 +807,56 @@ class MountrixMainWindow(QMainWindow):
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
         self.status_bar.showMessage("Bereit")
+
+    def _show_context_menu(self, pos):
+        """Kontextmenü für die Mount-Liste anzeigen."""
+        from PyQt6.QtWidgets import QMenu
+
+        items = self.mount_tree.selectedItems()
+        if not items:
+            return
+
+        item = items[0]
+        entry = item.data(0, Qt.ItemDataRole.UserRole)
+        mountpoint = item.text(3)
+        is_mounted = verify_mount(mountpoint)
+
+        menu = QMenu(self)
+
+        if is_mounted:
+            unmount_action = menu.addAction("Unmounten")
+            unmount_action.triggered.connect(lambda: self._do_unmount(mountpoint))
+        else:
+            mount_action = menu.addAction("Mounten")
+            mount_action.triggered.connect(lambda: self._do_mount(entry))
+
+        menu.addSeparator()
+        edit_action = menu.addAction("Bearbeiten...")
+        edit_action.triggered.connect(self.on_edit_mount)
+        delete_action = menu.addAction("Löschen")
+        delete_action.triggered.connect(self.on_delete_mount)
+
+        menu.exec(self.mount_tree.viewport().mapToGlobal(pos))
+
+    def _do_mount(self, entry):
+        """Mount aus Kontextmenü ausführen."""
+        if not entry:
+            return
+        result = mount_entry(entry)
+        if result.success:
+            self.status_bar.showMessage(f"Gemountet: {entry.mountpoint}")
+        else:
+            QMessageBox.warning(self, "Mount fehlgeschlagen", result.message)
+        self.refresh_mount_list()
+
+    def _do_unmount(self, mountpoint):
+        """Unmount aus Kontextmenü ausführen."""
+        result = unmount_entry(mountpoint)
+        if result.success:
+            self.status_bar.showMessage(f"Unmountet: {mountpoint}")
+        else:
+            QMessageBox.warning(self, "Unmount fehlgeschlagen", result.message)
+        self.refresh_mount_list()
 
     def refresh_mount_list(self):
         """Refresh the mount list from fstab."""
@@ -842,6 +896,9 @@ class MountrixMainWindow(QMainWindow):
                     ]
                 )
 
+                # FstabEntry als UserRole speichern
+                item.setData(0, Qt.ItemDataRole.UserRole, entry)
+
                 # Color-code status
                 if is_mounted:
                     item.setForeground(4, Qt.GlobalColor.darkGreen)
@@ -870,17 +927,14 @@ class MountrixMainWindow(QMainWindow):
             self.status_bar.showMessage("Fehler")
 
     def on_new_mount(self):
-        """Handle new mount action."""
-        # TODO: Show wizard or advanced dialog
-        QMessageBox.information(
-            self,
-            "Neuer Mount",
-            "Assistent-Modus oder Power-User-Modus?\n\n"
-            "Verwenden Sie die Buttons unten für den gewünschten Modus.",
-        )
+        """Handle new mount action — öffnet den Wizard."""
+        self.on_wizard_mode()
 
-    def on_edit_mount(self):
+    def on_edit_mount(self, item=None, column=None):
         """Handle edit mount action."""
+        from .advanced import AdvancedMountDialog
+        from PyQt6.QtWidgets import QDialog
+
         selected_items = self.mount_tree.selectedItems()
         if not selected_items:
             QMessageBox.warning(
@@ -888,13 +942,39 @@ class MountrixMainWindow(QMainWindow):
             )
             return
 
-        item = selected_items[0]
-        mountpoint = item.text(3)
+        tree_item = selected_items[0]
+        entry = tree_item.data(0, Qt.ItemDataRole.UserRole)
+        if not entry:
+            return
 
-        # TODO: Open edit dialog
-        QMessageBox.information(
-            self, "Mount bearbeiten", f"Bearbeiten: {mountpoint}\n\n(Noch nicht implementiert)"
-        )
+        dialog = AdvancedMountDialog(self, entry=entry)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        new_entry = dialog.get_entry()
+
+        # Erst unmounten wenn gemountet
+        if verify_mount(entry.mountpoint):
+            result = unmount_entry(entry.mountpoint)
+            if not result.success:
+                QMessageBox.warning(
+                    self, "Unmount-Fehler",
+                    f"Konnte nicht unmounten:\n{result.message}\n\nAbbruch."
+                )
+                return
+
+        try:
+            remove_entry(entry.mountpoint)
+            add_entry(new_entry)
+        except PermissionError:
+            QMessageBox.critical(self, "Berechtigung", "Root-Rechte benötigt für fstab-Änderungen.")
+            return
+        except ValueError as e:
+            QMessageBox.critical(self, "Fehler", str(e))
+            return
+
+        self.refresh_mount_list()
+        self.status_bar.showMessage(f"Mount aktualisiert: {new_entry.mountpoint}")
 
     def on_delete_mount(self):
         """Handle delete mount action."""
@@ -908,7 +988,6 @@ class MountrixMainWindow(QMainWindow):
         item = selected_items[0]
         mountpoint = item.text(3)
 
-        # Confirm deletion
         reply = QMessageBox.question(
             self,
             "Mount löschen",
@@ -917,33 +996,112 @@ class MountrixMainWindow(QMainWindow):
             QMessageBox.StandardButton.No,
         )
 
-        if reply == QMessageBox.StandardButton.Yes:
-            # TODO: Implement deletion
-            QMessageBox.information(
-                self, "Löschen", "Löschen-Funktion noch nicht implementiert."
-            )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+
+        # Erst unmounten wenn gemountet
+        if verify_mount(mountpoint):
+            result = unmount_entry(mountpoint)
+            if not result.success:
+                cont = QMessageBox.question(
+                    self, "Unmount-Fehler",
+                    f"Konnte nicht unmounten:\n{result.message}\n\nTrotzdem aus fstab löschen?",
+                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                    QMessageBox.StandardButton.No,
+                )
+                if cont != QMessageBox.StandardButton.Yes:
+                    return
+
+        try:
+            removed = remove_entry(mountpoint)
+            if removed:
+                self.status_bar.showMessage(f"Mount gelöscht: {mountpoint}")
+                self.refresh_mount_list()
+            else:
+                QMessageBox.warning(self, "Nicht gefunden", f"Kein Eintrag in fstab: {mountpoint}")
+        except PermissionError:
+            QMessageBox.critical(self, "Berechtigung", "Root-Rechte benötigt für fstab-Änderungen.")
 
     def on_wizard_mode(self):
         """Open wizard mode for creating new mount."""
-        # TODO: Open wizard dialog
-        QMessageBox.information(
-            self,
-            "Assistent-Modus",
-            "Der Assistent-Modus führt dich Schritt für Schritt durch "
-            "die Erstellung eines neuen Mounts.\n\n"
-            "(Noch nicht implementiert)",
-        )
+        from .wizard import MountWizard
+        from PyQt6.QtWidgets import QWizard
+
+        wizard = MountWizard(self)
+        if wizard.exec() != QWizard.DialogCode.Accepted:
+            return
+
+        entry = wizard.get_result_entry()
+        if not entry:
+            QMessageBox.warning(self, "Fehler", "Konnte keinen Mount-Eintrag erstellen.\nBitte alle Felder ausfüllen.")
+            return
+
+        # Mountpoint anlegen
+        mp_result = create_mountpoint(entry.mountpoint)
+        if not mp_result.success:
+            QMessageBox.warning(self, "Mountpoint-Fehler", mp_result.message)
+            return
+
+        # fstab-Eintrag schreiben
+        try:
+            add_entry(entry)
+        except PermissionError:
+            QMessageBox.critical(self, "Berechtigung", "Root-Rechte benötigt für fstab-Änderungen.")
+            return
+        except ValueError as e:
+            QMessageBox.critical(self, "Fehler", str(e))
+            return
+
+        # Sofort mounten versuchen
+        mount_result = mount_entry(entry)
+        if mount_result.success:
+            self.status_bar.showMessage(f"Gemountet: {entry.mountpoint}")
+            QMessageBox.information(self, "Erfolg", f"Mount erfolgreich erstellt!\n\n{entry.mountpoint}")
+        else:
+            QMessageBox.warning(
+                self, "Hinweis",
+                f"In fstab gespeichert, aber Mount fehlgeschlagen:\n{mount_result.message}\n\n"
+                "Du kannst ihn später über das Kontextmenü (Rechtsklick) mounten."
+            )
+
+        self.refresh_mount_list()
 
     def on_advanced_mode(self):
         """Open advanced mode for power users."""
-        # TODO: Open advanced dialog
-        QMessageBox.information(
-            self,
-            "Power-User-Modus",
-            "Im Power-User-Modus kannst du alle fstab-Parameter "
-            "direkt konfigurieren.\n\n"
-            "(Noch nicht implementiert)",
-        )
+        from .advanced import AdvancedMountDialog
+        from PyQt6.QtWidgets import QDialog
+
+        dialog = AdvancedMountDialog(self)
+        if dialog.exec() != QDialog.DialogCode.Accepted:
+            return
+
+        entry = dialog.get_entry()
+
+        # Mountpoint anlegen
+        mp_result = create_mountpoint(entry.mountpoint)
+        if not mp_result.success:
+            QMessageBox.warning(self, "Mountpoint-Fehler", mp_result.message)
+            return
+
+        try:
+            add_entry(entry)
+        except PermissionError:
+            QMessageBox.critical(self, "Berechtigung", "Root-Rechte benötigt für fstab-Änderungen.")
+            return
+        except ValueError as e:
+            QMessageBox.critical(self, "Fehler", str(e))
+            return
+
+        mount_result = mount_entry(entry)
+        if mount_result.success:
+            self.status_bar.showMessage(f"Gemountet: {entry.mountpoint}")
+        else:
+            QMessageBox.warning(
+                self, "Hinweis",
+                f"In fstab gespeichert, aber Mount fehlgeschlagen:\n{mount_result.message}"
+            )
+
+        self.refresh_mount_list()
 
     def on_settings(self):
         """Open settings dialog."""

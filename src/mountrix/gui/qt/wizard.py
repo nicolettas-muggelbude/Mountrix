@@ -24,9 +24,11 @@ from PyQt6.QtWidgets import (
     QListWidget,
 )
 
+from ...core.fstab import FstabEntry
 from ...core.templates import load_templates
 from ...core.network import ping_host, check_port, diagnose_connection
 from ...core.detector import detect_local_drives
+from ...core.mounter import get_current_username
 from .dialogs import setup_combobox_auto_close
 
 
@@ -64,6 +66,67 @@ class MountWizard(QWizard):
         self.setPage(self.PAGE_CONFIRM, ConfirmPage())
 
         self.setStartId(self.PAGE_MODE)
+
+    def get_result_entry(self) -> FstabEntry | None:
+        """Baut einen FstabEntry aus den Wizard-Feldern."""
+        mount_name = self.field("options.name")
+        user_mount = self.field("options.user_mount")
+
+        if not mount_name:
+            return None
+
+        # Mountpoint bestimmen
+        if user_mount:
+            username = get_current_username()
+            mountpoint = f"/media/{username}/{mount_name}"
+        else:
+            mountpoint = f"/mnt/{mount_name}"
+
+        # Optionen zusammenstellen
+        options = ["defaults"]
+        if self.field("options.nofail"):
+            options.append("nofail")
+        if not self.field("options.boot"):
+            options.append("noauto")
+
+        is_network = self.field("mode.network")
+
+        if is_network:
+            host = self.field("network.host")
+            share = self.field("network.share")
+            protocol_idx = self.field("network.protocol")
+            protocol = "cifs" if protocol_idx == 0 else "nfs"
+
+            if protocol == "cifs":
+                source = f"//{host}/{share}"
+                auth_user = self.field("auth.username")
+                auth_pass = self.field("auth.password")
+                if auth_user:
+                    options.extend([f"username={auth_user}", f"password={auth_pass}"])
+            else:
+                source = f"{host}:{share}"
+
+            return FstabEntry(
+                source=source,
+                mountpoint=mountpoint,
+                fstype=protocol,
+                options=options,
+                comment=f"Mountrix: {mount_name}",
+            )
+        else:
+            local_page = self.page(self.PAGE_LOCAL_DRIVE)
+            drive = local_page.get_selected_drive()
+            if not drive:
+                return None
+
+            source = f"UUID={drive.uuid}" if drive.uuid else drive.device
+            return FstabEntry(
+                source=source,
+                mountpoint=mountpoint,
+                fstype=drive.filesystem,
+                options=options,
+                comment=f"Mountrix: {mount_name}",
+            )
 
 
 class ModePage(QWizardPage):
@@ -279,14 +342,18 @@ class LocalDrivePage(QWizardPage):
 
         self.setLayout(layout)
 
+        self._drives = []
+
         # Initial load
         self._refresh_drives()
 
     def _refresh_drives(self):
         """Refresh the drive list."""
         self.drive_list.clear()
+        self._drives = []
         try:
             drives = detect_local_drives()
+            self._drives = drives
             for drive in drives:
                 label = f"{drive.name} ({drive.device}) - {drive.filesystem} - {drive.size_gb:.1f} GB"
                 if drive.label:
@@ -294,6 +361,13 @@ class LocalDrivePage(QWizardPage):
                 self.drive_list.addItem(label)
         except Exception as e:
             self.drive_list.addItem(f"Fehler: {str(e)}")
+
+    def get_selected_drive(self):
+        """Gibt das ausgewählte Laufwerk zurück."""
+        row = self.drive_list.currentRow()
+        if row >= 0 and row < len(self._drives):
+            return self._drives[row]
+        return None
 
     def nextId(self):
         """Go to mount options page (skip auth for local drives)."""
