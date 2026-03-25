@@ -14,6 +14,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+from .privilege import copy_privileged, write_privileged
+
 
 @dataclass
 class FstabEntry:
@@ -163,15 +165,21 @@ def backup_fstab(
         raise FileNotFoundError(f"fstab not found: {fstab_path}")
 
     # Create backup directory if it doesn't exist
-    Path(backup_dir).mkdir(parents=True, exist_ok=True)
+    try:
+        Path(backup_dir).mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        pass  # copy_privileged handles permission below
 
     # Generate backup filename with timestamp
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_filename = f"fstab.backup.{timestamp}"
     backup_path = Path(backup_dir) / backup_filename
 
-    # Copy file
-    shutil.copy2(fstab_path, backup_path)
+    # Copy file (privileged fallback if needed)
+    try:
+        shutil.copy2(fstab_path, backup_path)
+    except PermissionError:
+        copy_privileged(fstab_path, str(backup_path))
 
     return str(backup_path)
 
@@ -218,12 +226,23 @@ def add_entry(
         if existing.mountpoint == entry.mountpoint:
             raise ValueError(f"Mountpoint {entry.mountpoint} already exists in fstab")
 
-    # Append entry
-    with open(fstab_path, "a") as f:
-        # Add comment if present
-        if entry.comment:
-            f.write(f"# {entry.comment}\n")
-        f.write(str(entry) + "\n")
+    # Append entry (privileged fallback if needed)
+    new_line = ""
+    if entry.comment:
+        new_line += f"# {entry.comment}\n"
+    new_line += str(entry) + "\n"
+
+    try:
+        with open(fstab_path, "a") as f:
+            f.write(new_line)
+    except PermissionError:
+        # Read current content and rewrite with appended entry
+        try:
+            with open(fstab_path, "r") as f:
+                current = f.read()
+        except Exception as e:
+            raise PermissionError(f"Fehler beim Lesen von {fstab_path}: {e}")
+        write_privileged(current + new_line, fstab_path)
 
     return True
 
@@ -394,8 +413,11 @@ def _write_fstab(entries: List[FstabEntry], fstab_path: str) -> None:
     """
     content = _generate_fstab_content(entries)
 
-    with open(fstab_path, "w") as f:
-        f.write(content)
+    try:
+        with open(fstab_path, "w") as f:
+            f.write(content)
+    except PermissionError:
+        write_privileged(content, fstab_path)
 
 
 def _generate_fstab_content(entries: List[FstabEntry]) -> str:

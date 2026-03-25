@@ -153,10 +153,26 @@ Implementierte Features:
 - ✅ FstabEntry als `UserRole` in TreeWidgetItem gespeichert
 - ✅ LocalDrivePage speichert `_drives` Liste + `get_selected_drive()`
 
-### Nächste Schritte (Phase 4+)
+## Phase 4: sudo/pkexec-Integration ✅ (Abgeschlossen)
+
+### Neues Modul `core/privilege.py`
+Zentrales Modul für Privilegienerweiterung:
+- `is_root()` – prüft ob Prozess als Root läuft
+- `find_privilege_escalator()` – findet `pkexec` (bevorzugt, zeigt Polkit-Dialog) oder `sudo`
+- `run_privileged(cmd, timeout)` – führt Befehl mit Rechteerhöhung aus
+- `write_privileged(content, dest_path)` – schreibt Root-geschützte Datei via Temp-Datei + `cp`
+- `copy_privileged(src, dst)` – kopiert Datei mit Root-Rechten
+- `mkdir_privileged(path)` – erstellt Verzeichnis mit Root-Rechten
+
+**Strategie:** Direkter Aufruf wenn bereits Root, sonst pkexec (Polkit-GUI-Dialog) → sudo-Fallback.
+
+### Geänderte Module
+- **`mounter.py`**: `create_mountpoint`, `mount_entry`, `unmount_entry` – Fallback auf `run_privileged()` / `mkdir_privileged()` bei `PermissionError`
+- **`fstab.py`**: `backup_fstab`, `_write_fstab`, `add_entry` – Fallback auf `copy_privileged()` / `write_privileged()` bei `PermissionError`
+
+### Nächste Schritte (Phase 5+)
 
 ### TODO: Funktionalität
-- [ ] sudo/pkexec-Integration für Root-Operationen (mount, fstab-Schreiben)
 - [ ] Backup/Rollback für fstab-Änderungen (UI-seitig)
 - [ ] Credentials im Keyring speichern (Wizard AuthPage)
 
@@ -214,5 +230,5 @@ python3 test_modern_design.py
 - CLAUDE.md für Projekt-Kontinuität
 
 ---
-*Zuletzt aktualisiert: 2026-03-11*
-*Status: Phase 3 (GUI-Backend-Anbindung) abgeschlossen ✅*
+*Zuletzt aktualisiert: 2026-03-25*
+*Status: Phase 4 (sudo/pkexec-Integration) abgeschlossen ✅*

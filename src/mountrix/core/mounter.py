@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from .fstab import FstabEntry
+from .privilege import is_root, mkdir_privileged, run_privileged
 
 
 @dataclass
@@ -90,38 +91,37 @@ def create_mountpoint(path: str, user_only: bool = False) -> MountResult:
     # Create directory
     try:
         full_path.mkdir(parents=True, exist_ok=True)
-
-        # Set appropriate permissions
-        if user_only:
-            # For user-only mounts, set ownership to current user
-            try:
-                import pwd
-
-                uid = pwd.getpwnam(get_current_username()).pw_uid
-                os.chown(full_path, uid, uid)
-                full_path.chmod(0o755)
-            except Exception:
-                # If setting ownership fails, continue anyway
-                pass
-        else:
-            # For system mounts, keep root ownership
-            full_path.chmod(0o755)
-
-        return MountResult(
-            success=True,
-            message=f"Mountpoint created: {full_path}",
-            mountpoint=str(full_path),
-        )
-
     except PermissionError:
-        return MountResult(
-            success=False,
-            message=f"Permission denied creating {full_path}. Root privileges required.",
-        )
+        # Fall back to privileged mkdir
+        try:
+            mkdir_privileged(str(full_path))
+        except PermissionError as e:
+            return MountResult(success=False, message=str(e))
+        except Exception as e:
+            return MountResult(
+                success=False, message=f"Fehler beim Erstellen des Mountpoints: {str(e)}"
+            )
     except Exception as e:
         return MountResult(
-            success=False, message=f"Error creating mountpoint: {str(e)}"
+            success=False, message=f"Fehler beim Erstellen des Mountpoints: {str(e)}"
         )
+
+    # Set appropriate permissions for user-only mounts
+    if user_only and full_path.exists():
+        try:
+            import pwd
+
+            uid = pwd.getpwnam(get_current_username()).pw_uid
+            os.chown(full_path, uid, uid)
+            full_path.chmod(0o755)
+        except Exception:
+            pass
+
+    return MountResult(
+        success=True,
+        message=f"Mountpoint erstellt: {full_path}",
+        mountpoint=str(full_path),
+    )
 
 
 def mount_entry(entry: FstabEntry) -> MountResult:
@@ -178,39 +178,39 @@ def mount_entry(entry: FstabEntry) -> MountResult:
     mount_cmd.append(entry.source)
     mount_cmd.append(entry.mountpoint)
 
-    # Execute mount
+    # Execute mount (with privilege escalation if not root)
     try:
-        result = subprocess.run(
-            mount_cmd, capture_output=True, text=True, timeout=30, check=False
-        )
+        if is_root():
+            result = subprocess.run(
+                mount_cmd, capture_output=True, text=True, timeout=30, check=False
+            )
+        else:
+            result = run_privileged(mount_cmd, timeout=30)
 
         if result.returncode == 0:
             return MountResult(
                 success=True,
-                message=f"Successfully mounted {entry.source} to {entry.mountpoint}",
+                message=f"{entry.source} erfolgreich nach {entry.mountpoint} gemountet",
                 mountpoint=entry.mountpoint,
             )
         else:
             error_msg = result.stderr.strip() or result.stdout.strip()
             return MountResult(
                 success=False,
-                message=f"Mount failed: {error_msg}",
+                message=f"Mount fehlgeschlagen: {error_msg}",
                 error_code=result.returncode,
             )
 
     except subprocess.TimeoutExpired:
-        return MountResult(success=False, message="Mount operation timed out")
-    except PermissionError:
-        return MountResult(
-            success=False,
-            message="Permission denied. Root privileges required for mounting.",
-        )
+        return MountResult(success=False, message="Mount-Vorgang hat das Zeitlimit überschritten")
+    except PermissionError as e:
+        return MountResult(success=False, message=str(e))
     except FileNotFoundError:
         return MountResult(
-            success=False, message="mount command not found. Install mount utilities."
+            success=False, message="mount-Befehl nicht gefunden. mount-Utilities installieren."
         )
     except Exception as e:
-        return MountResult(success=False, message=f"Unexpected error: {str(e)}")
+        return MountResult(success=False, message=f"Unerwarteter Fehler: {str(e)}")
 
 
 def unmount_entry(mountpoint: str, force: bool = False) -> MountResult:
@@ -246,55 +246,54 @@ def unmount_entry(mountpoint: str, force: bool = False) -> MountResult:
 
     umount_cmd.append(mountpoint)
 
-    # Execute unmount
+    # Execute unmount (with privilege escalation if not root)
     try:
-        result = subprocess.run(
-            umount_cmd, capture_output=True, text=True, timeout=30, check=False
-        )
+        if is_root():
+            result = subprocess.run(
+                umount_cmd, capture_output=True, text=True, timeout=30, check=False
+            )
+        else:
+            result = run_privileged(umount_cmd, timeout=30)
 
         if result.returncode == 0:
             return MountResult(
                 success=True,
-                message=f"Successfully unmounted {mountpoint}",
+                message=f"{mountpoint} erfolgreich ausgehängt",
                 mountpoint=mountpoint,
             )
         else:
             error_msg = result.stderr.strip() or result.stdout.strip()
 
-            # Check for common errors
             if "not mounted" in error_msg.lower():
                 return MountResult(
-                    success=True,  # Not an error if already unmounted
-                    message=f"{mountpoint} is not mounted",
+                    success=True,
+                    message=f"{mountpoint} ist nicht gemountet",
                     mountpoint=mountpoint,
                 )
             elif "busy" in error_msg.lower() or "target is busy" in error_msg.lower():
-                suggestion = " Try force unmount or close applications using this mount."
                 return MountResult(
                     success=False,
-                    message=f"Unmount failed: Device is busy.{suggestion}",
+                    message="Aushängen fehlgeschlagen: Gerät ist beschäftigt. "
+                            "Anwendungen schließen, die diesen Mount verwenden.",
                     error_code=result.returncode,
                 )
             else:
                 return MountResult(
                     success=False,
-                    message=f"Unmount failed: {error_msg}",
+                    message=f"Aushängen fehlgeschlagen: {error_msg}",
                     error_code=result.returncode,
                 )
 
     except subprocess.TimeoutExpired:
-        return MountResult(success=False, message="Unmount operation timed out")
-    except PermissionError:
-        return MountResult(
-            success=False,
-            message="Permission denied. Root privileges required for unmounting.",
-        )
+        return MountResult(success=False, message="Aushänge-Vorgang hat das Zeitlimit überschritten")
+    except PermissionError as e:
+        return MountResult(success=False, message=str(e))
     except FileNotFoundError:
         return MountResult(
-            success=False, message="umount command not found. Install mount utilities."
+            success=False, message="umount-Befehl nicht gefunden. mount-Utilities installieren."
         )
     except Exception as e:
-        return MountResult(success=False, message=f"Unexpected error: {str(e)}")
+        return MountResult(success=False, message=f"Unerwarteter Fehler: {str(e)}")
 
 
 def verify_mount(mountpoint: str) -> bool:
